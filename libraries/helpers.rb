@@ -16,6 +16,16 @@ module Dcos
       node['dcos']['dcos_enterprise'].to_s == 'true'
     end
 
+    def dcos_cluster_address
+      if node['dcos']['config']['master_discovery'] == 'master_http_loadbalancer'
+        node['dcos']['config']['master_external_loadbalancer']
+      elsif node['dcos']['config'].key?('master_list') && !node['dcos']['config']['master_list'].empty?
+        node['dcos']['config']['master_list'].first # yuck, figure out something better
+      else
+        'leader.mesos' # assume we're inside the cluster
+      end
+    end
+
     private
 
     def dcos_base_url
